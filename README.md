@@ -30,9 +30,9 @@ To uninstall using [pip](https://pip.pypa.io). :
 
     >>> pip uninstall mathcrypto
 
-## Usage
+## Documentation
 
-TODO
+You can read the full documentation [here](https://mathcrypto.readthedocs.io/en/latest/).
 
 ## Development
 
