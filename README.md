@@ -1,6 +1,6 @@
 # MathCrypto
 
-[mathcrypto](mathcrypto_) is a library of useful funtions used in cryptography. Do not use this library for improving the security of your application, it is not safe or powerful enough to provide that.
+MathCrypto is a library of useful funtions used in cryptography. Do not use this library for improving the security of your application, it is not safe or powerful enough to provide that.
 
 Available functions include:
 
@@ -22,7 +22,7 @@ Functions from this library can be used to solve recreational mathematics, crypt
 
 ## Installation
 
-[mathcrypto](mathcrypto_) is avalaible through Python Package Index ([PyPI](https://pypi.python.org/pypi)) using [pip](https://pip.pypa.io). :
+MathCrypto is avalaible through Python Package Index ([PyPI](https://pypi.python.org/pypi)) using [pip](https://pip.pypa.io). :
 
     >>> pip install --upgrade mathcrypto
 
