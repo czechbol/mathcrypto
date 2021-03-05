@@ -25,7 +25,7 @@ class MathFunctions:
     def auto_fermat_prime_test(cls, num: int, rounds: int, verbose: bool = False):
         """Automatic Fermat's primality test
         This test can not provide 100% certainty that the number is indeed prime,\
-        so more than 1 round should be required. 
+        so more than 1 round should be required.
         If determined that the number is not prime, that is on the other hand 100% certain.
         Tests for the number of rounds specified, 2-3 rounds are generally enough.
         If any round returns a result that is not 1, the number is not prime."""
