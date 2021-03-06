@@ -32,13 +32,13 @@ MathCrypto is avalaible through Python Package Index (`PyPI <https://pypi.python
 
 .. code-block:: bash
 
-   $ pip install mathcrypto
+   $ python3 -m pip install mathcrypto
 
 To uninstall using `pip <https://pip.pypa.io>`_:
 
 .. code-block:: bash
 
-   $ pip pip uninstall mathcrypto
+   $ python3 -m pip uninstall mathcrypto
 
 Getting Started
 ===============
