@@ -24,11 +24,15 @@ Functions from this library can be used to solve recreational mathematics, crypt
 
 MathCrypto is avalaible through Python Package Index ([PyPI](https://pypi.python.org/pypi)) using [pip](https://pip.pypa.io). :
 
-    >>> pip install --upgrade mathcrypto
+```console
+foo@bar:~$ python3 -m pip install --upgrade mathcrypto
+```
 
 To uninstall using [pip](https://pip.pypa.io). :
 
-    >>> pip uninstall mathcrypto
+```console
+foo@bar:~$ python3 -m pip uninstall mathcrypto
+```
 
 ## Documentation
 
