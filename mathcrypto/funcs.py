@@ -1,5 +1,6 @@
 import math
 import random
+import gmpy2
 from itertools import count, islice
 
 
@@ -7,14 +8,18 @@ class MathFunctions:
     """A collection of useful mathematical functions"""
 
     @classmethod
-    def is_prime(cls, num: int):
+    def is_prime(cls, num: int) -> bool:
         """Classic number modulus check
 
         Tests divisibility by 2 and then every odd number up to sqrt(num).
         Takes longer to compute than Fermat's primality test but has 100% certainty.
+        Cannot handle numbers larger than the system maxint.
 
         Args:
             num (int): Number to test
+
+        Raises:
+            OverflowError: If the number is too large
 
         Returns:
             bool: True if ``num`` is prime
@@ -25,16 +30,20 @@ class MathFunctions:
 
         if (num % 2) == 0:
             return False
-        for number in islice(count(3, 2), int((math.sqrt(num) / 2) - 1)):
-            if num % number == 0:
-                return False
+        try:
+            for number in islice(count(3, 2), int((math.sqrt(num) / 2) - 1)):
+                if num % number == 0:
+                    return False
+        except OverflowError:
+            raise OverflowError("The number is too large to process.")
+
         return True
 
     @classmethod
-    def auto_fermat_prime_test(cls, num: int, rounds: int, verbose: bool = False):
+    def fermat_prime_test_auto(cls, num: int, rounds: int = 5, verbose: bool = False) -> bool:
         """Automatic Fermat's primality test
 
-        This test can not provide 100% certainty that the number is indeed prime,\
+        This test can not provide 100% certainty that the number is indeed prime, \
         so more than 1 round should be required.
         If determined that the number is not prime, that is on the other hand 100% certain.
         Tests for the number of rounds specified, 2-3 rounds are generally enough.
@@ -43,7 +52,9 @@ class MathFunctions:
         Args:
             num (int): Number to be tested
             rounds (int): How many rounds of testing to perform
-            verbose (bool, optional): Whether to return optional list of dictionary pairs "tester", "result". Defaults to False.
+            verbose (bool, optional): Whether to return optional \
+                list of [<number it was tested against>: `int`,<result>: `int`]. \
+                Defaults to False.
 
         Returns:
             bool: True if probably prime
@@ -52,7 +63,7 @@ class MathFunctions:
             (tuple): tuple containing:
 
                 - bool: True if probably prime
-                - dict: Dictionary of "tester" and "result"
+                - list: List of [<number it was tested against>: `int`,<result>: `int`]
         """
 
         if num - 1 < 5:
@@ -67,7 +78,7 @@ class MathFunctions:
             res = pow(tester, num - 1, num)
             if res != 1:
                 is_prime = False
-            result_list.append({"tester": tester, "result": res})
+            result_list.append([tester, res])
         if is_prime is None:
             is_prime = True
 
@@ -76,7 +87,7 @@ class MathFunctions:
         return is_prime
 
     @classmethod
-    def manual_fermat_prime_test(cls, num: int, tester: int, verbose: bool = False):
+    def fermat_prime_test_manual(cls, num: int, tester: int, verbose: bool = False) -> bool:
         """Manual Fermat's primality test
 
         This test can not provide 100% certainty that the number is indeed prime,\
@@ -88,7 +99,9 @@ class MathFunctions:
         Args:
             num (int): Number to be tested
             tester (int): Number to test the primality of ``num`` with
-            verbose (bool, optional): Whether to return optional list of dictionary pairs "tester", "result". Defaults to False.
+            verbose (bool, optional): Whether to return optional \
+                list of [<number it was tested against>: `int`,<result>: `int`]. \
+                Defaults to False.
 
         Returns:
             bool: True if probably prime
@@ -97,24 +110,27 @@ class MathFunctions:
             (tuple): tuple containing:
 
                 - bool: True if probably prime
-                - dict: Dictionary of "tester" and "result"
+                - list: List of [<number it was tested against>: `int`,<result>: `int`]
         """
 
         res = pow(tester, num - 1, num)
-        result = {"tester": tester, "result": res}
+        result = [tester, res]
         if res != 1:
             is_prime = False
         else:
             is_prime = True
-        return is_prime, result
+        if verbose:
+            return is_prime, result
+        return is_prime
 
     @classmethod
-    def factorize(cls, num: int):
+    def factorize(cls, num: int) -> list:
         """Classic number factorization
 
         Tests divisibility by 2 and then every odd number up to sqrt(num)\
         while appending the factors. If the number contains multiple instances of a factor,\
         this function returns a list with duplicates.
+        Very fast unless the number is a compound of more than one large prime (more than 7 digits, 8 is still acceptable).
 
         Args:
             num (int): Number to factorize
@@ -123,23 +139,31 @@ class MathFunctions:
             list: List of factors including duplicates
         """
 
-        factors = []
+        """Using gmpy2 library (written in C) for faster computation."""
 
-        while (num % 2) == 0:
-            factors.append(2)
-            num //= 2
-        for number in islice(count(3, 2), int((math.sqrt(num) / 2) - 1)):
-            while (num % number) == 0:
-                factors.append(number)
-                num //= number
+        factors = []
+        if gmpy2.is_prime(num):
+            return [num]
+
+        for number in range(2, gmpy2.isqrt(num)):  # isqrt is the integer result of sqrt
+            was_in_while = False
+            while gmpy2.t_mod(num, number) == 0:  # same as (num % number) but faster
+                was_in_while = True
+                factors.append(int(number))
+                num = gmpy2.t_div(num, number)  # same as int(num / number) but faster
+            if was_in_while:
+                if gmpy2.is_prime(num) or num == 1:
+                    break
 
         if num > 1:
-            factors.append(num)
+            factors.append(int(num))
         return factors
 
     @classmethod
-    def phi(cls, num: int):
-        """Euler's Totient function Phi
+    def phi(cls, num: int) -> int:
+        """Euler's Totient function Phi.
+        If the number is not prime, the execution time depends on the speed of factorization.
+
 
         Args:
             num (int): Any positive whole number
@@ -148,17 +172,24 @@ class MathFunctions:
             int: How many elements belong to a multiplicative group set by this number.
         """
 
-        if cls.is_prime(num):
+        """Using gmpy2 library (written in C) for faster computation."""
+
+        if gmpy2.is_prime(num):
             return num - 1
 
-        result = 0
-        for i in range(1, num):
-            if math.gcd(i, num) == 1:
-                result += 1
-        return result
+        factors = cls.factorize(num)
+        totient = 1
+        used = []
+        for factor in factors:
+            if factor in used:
+                totient = gmpy2.mul(totient, factor)  # same as (totient * factor) but faster
+            else:
+                totient = gmpy2.mul(totient, factor - 1)  # same as (totient * (factor - 1)) but faster
+                used.append(factor)
+        return int(totient)
 
     @classmethod
-    def euclid_gcd(cls, num_a: int, num_b: int):
+    def euclid_gcd(cls, num_a: int, num_b: int) -> int:
         """Euclidean algorithm
 
         Calculates the Greatest Common Divisor of two numbers.
@@ -176,7 +207,7 @@ class MathFunctions:
         return cls.euclid_gcd(num_b % num_a, num_a)
 
     @classmethod
-    def crt(cls, lis):
+    def crt(cls, lis) -> int:
         """Chinese remainder theorem
 
         Solves x for problems like:
@@ -185,14 +216,16 @@ class MathFunctions:
 
         Args:
             lis : list
-                of {str: int}:
+                of [int, int]:
 
         Example input:
-            [{"modulus": 9, "result": 8},{"modulus": 3, "result": 5}] for the example problem
+            [[8, 9],[3, 5]] for the example problem
 
         Returns:
             int: Solution for x
         """
+
+        """Using gmpy2 library (written in C) for faster computation."""
 
         M = 1
         temp = 0
@@ -200,25 +233,26 @@ class MathFunctions:
         moduli = []
         for item in lis:
             if moduli == []:
-                moduli.append(item["modulus"])
-                M *= item["modulus"]
+                moduli.append(item[1])
+                M *= item[1]
+                continue
 
             for num in moduli:
-                if math.gcd(num, item["modulus"]) != 1:
+                if gmpy2.gcd(num, item[1]) != 1:
                     break
             else:
-                moduli.append(item["modulus"])
-                M *= item["modulus"]
+                moduli.append(item[1])
+                M *= item[1]
 
         for item in lis:
-            N = int(M / item["modulus"])
-            L = pow(N, MathFunctions.phi(item["modulus"]) - 1, item["modulus"])
-            W = (L * N) % M
-            temp += item["result"] * W
-        return temp % M
+            N = gmpy2.t_div(M, item[1])  # same as int(M / item[1]) but faster
+            L = gmpy2.powmod(N, -1, item[1])  # = n^(-1) mod item[1], the inverse element of n mod item[1]
+            W = gmpy2.t_mod(gmpy2.mul(L, N), M)  # same as ((L*N) % M) but faster
+            temp += gmpy2.mul(item[0], W)  # same as (item[1] * W) but faster
+        return int(gmpy2.t_mod(temp, M))  # same as (temp % M) but faster
 
     @classmethod
-    def eea(cls, modulus: int, number: int, verbose: bool = False):
+    def eea(cls, modulus: int, number: int, verbose: bool = False) -> int:
         """Extended Euclidean Algorithm
 
         Get multiplicative inverse of a number in modulus
@@ -229,7 +263,7 @@ class MathFunctions:
             verbose (bool, optional): Whether to return a graphical solution. Defaults to False.
 
         Raises:
-            ValueError: If number is not an eleent of the group defined by ``modulus``
+            ValueError: If number is not an element of the group defined by ``modulus``
 
         Returns:
             int: resulting inverse
@@ -238,12 +272,14 @@ class MathFunctions:
             str: Graphical solution of the problem.
         """
 
+        """Using gmpy2 library (written in C) for faster computation."""
+
         class EEA:
             def __init__(self, n: int, x: int):
                 self.n = n
                 self.x = x
 
-                if math.gcd(n, x) != 1:
+                if gmpy2.gcd(n, x) != 1:
                     raise ValueError(f"{x} is not element of group Z_{n}^*.")
 
                 self.table = self._compute_table()

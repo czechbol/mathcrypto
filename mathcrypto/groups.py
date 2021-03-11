@@ -1,4 +1,4 @@
-import math
+import gmpy2
 from .funcs import MathFunctions
 
 
@@ -9,13 +9,13 @@ class MultiplicativeGroup:
     Attributes:
         mod (int): Modulus of the group
         elements (list): List of elements in the group
-        order (order): Order of the group
-        generators (generators): List of generators of the group
+        order (int): Order of the group
+        generators (list): List of generators of the group
     """
 
     def __init__(self, mod):
         self.mod = mod
-        self.elements = self._generate_elements(mod)
+        self.elements = self._generate_elements()
         self.order = len(self.elements)
         self.generators = self._get_generators()
 
@@ -31,7 +31,7 @@ class MultiplicativeGroup:
 
         elements = []
         for i in range(1, self.mod):
-            if math.gcd(i, self.mod) == 1:
+            if gmpy2.gcd(i, self.mod) == 1:
                 elements.append(i)
         return elements
 
@@ -52,13 +52,13 @@ class MultiplicativeGroup:
         generators = []
         for element in self.elements:
             for factor in cleaned_factors:
-                if pow(element, int(phi / factor), self.mod) == 1:
+                if gmpy2.powmod(element, int(phi / factor), self.mod) == 1:
                     break
             else:
                 generators.append(element)
         return generators
 
-    def get_element_order(self, element):
+    def get_element_order(self, element) -> int:
         """Gets the order of an element in the group
 
         Args:
@@ -78,10 +78,10 @@ class MultiplicativeGroup:
 
         s = set()
         for exp in range(len(self.elements)):
-            s.add(element ** exp % self.mod)
+            s.add(int(gmpy2.powmod(element, exp, self.mod)))
         return len(s)
 
-    def get_inverse_element(self, element: int):
+    def get_inverse_element(self, element: int) -> int:
         """Gets the inverse to an element in the group
 
         Args:
@@ -97,5 +97,5 @@ class MultiplicativeGroup:
         """Returns the inverse to an element in the group"""
         if element not in self.elements:
             raise ValueError
-        inverse = pow(element, MathFunctions.phi(self.mod) - 1, self.mod)
+        inverse = int(gmpy2.powmod(element, MathFunctions.phi(self.mod) - 1, self.mod))
         return inverse
