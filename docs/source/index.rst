@@ -16,14 +16,17 @@ Includes
    - Get inverse element any element of the group
    - Get element order of any element in group
 - Math functions
-   - Number primality checks
-      - Classic number modulus check
-      - Fermat's primality test
+   - Classic number primality check
+   - Fermat's primality test
    - Euler's Totient function (Phi)
    - Euclidean algorithm (GCD)
    - Simple number factorization
    - Chinese Remainder Theorem
    - Extended Euclidean Algorithm
+- Cryptography algorithms
+   - Diffie-Hellman Key exchange generation and cracking
+      - Multithreaded Brute-force cracking
+      - Baby-step Giant-step algorithm cracking
 
 Installation
 ============

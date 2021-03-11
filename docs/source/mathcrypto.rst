@@ -4,6 +4,14 @@ mathcrypto package
 Submodules
 ----------
 
+mathcrypto.crypto module
+------------------------
+
+.. automodule:: mathcrypto.crypto
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 mathcrypto.funcs module
 -----------------------
 
