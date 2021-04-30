@@ -145,7 +145,7 @@ class MathFunctions:
         if gmpy2.is_prime(num):
             return [num]
 
-        for number in range(2, gmpy2.isqrt(num)):  # isqrt is the integer result of sqrt
+        for number in range(2, gmpy2.isqrt(num) + 1):  # isqrt is the integer result of sqrt
             was_in_while = False
             while gmpy2.t_mod(num, number) == 0:  # same as (num % number) but faster
                 was_in_while = True
