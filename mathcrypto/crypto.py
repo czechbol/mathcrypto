@@ -249,3 +249,21 @@ class DHCracker:
             else:
                 giant_step = gmpy2.t_mod(gmpy2.mul(giant_step, inverzni_k_N), crack_me.prime)
         return None
+
+    @classmethod
+    def mov_attack(secret: int, g: int, order: int) -> int or None:
+        """The MOV attack on Elliptic curve DH.
+
+        Args:
+            secret (int): Secret to be cracked
+            g (int)
+            order (int)
+
+        Returns:
+            int or None: int if secret was cracked, else None
+        """
+        for i in range(1, order + 1):
+            a = g ** i % (order + 1)
+            if a == secret:
+                return i
+        return None
