@@ -27,3 +27,11 @@ mathcrypto.groups module
    :members:
    :undoc-members:
    :show-inheritance:
+
+mathcrypto.elliptic module
+------------------------
+
+.. automodule:: mathcrypto.elliptic
+   :members:
+   :undoc-members:
+   :show-inheritance:
