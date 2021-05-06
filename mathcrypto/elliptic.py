@@ -1,4 +1,10 @@
-from .groups import MultiplicativeGroup
+"""This module wouldn't be possible to be created this fast
+    if I didn't leverage the code that was written by xnomas and Baka-Git in their repository at:
+
+    https://github.com/Baka-Git/Crypto_Math
+
+    I want to thank them for allowing me to use their code.
+"""
 
 
 class EllipticCurve:
@@ -27,13 +33,15 @@ class EllipticCurve:
         self.point_p = [point_px, point_py]
         self.field = field
 
-    def _divisors(number: int):
+    @classmethod
+    def _divisors(cls, number: int):
         list_of_divisors = []
         for num in range(1, int(number) + 1):
             if int(number) % num == 0:
                 list_of_divisors.append(num)
         return list_of_divisors
 
+    @classmethod
     def _find_point(self, x, x_side, y_2_points, f):
         for y in range(0, len(y_2_points)):
             if x_side == y_2_points[y]:
@@ -42,11 +50,19 @@ class EllipticCurve:
                 return [[x, self._find_sqrt_ec(y_2_points[y], f)], [x, -self._find_sqrt_ec(y_2_points[y], f)]]
         return False
 
+    @classmethod
     def _find_sqrt_ec(self, x, field):
         for i in range(0, field):
             result = (i * i) % field
             if result == x:
                 return i
+
+    @classmethod
+    def _find_inverse(cls, num, mod):
+        for i in range(1, int(mod)):
+            if (i * num) % mod == 1:
+                return i
+        return False
 
     def is_elliptic_curve(self):
         """Checks if the curve is elliptic
@@ -131,7 +147,7 @@ class EllipticCurve:
                     list_of_points.append(line[4][1])
                     order += 2
 
-        if get_points:
+        if not get_points:
             return order
         else:
             return order, list_of_points
@@ -151,7 +167,7 @@ class EllipticCurve:
         """
         if self.field is None:
             raise ValueError("Field is needed for this.")
-        if not self.is_elliptic(self.attributes):
+        if not self.is_elliptic_curve():
             raise ValueError("This is not an elliptic curve!")
 
         a = (y ** 2 + self.attributes[1] * y + self.attributes[2] * x * y) % self.field
@@ -192,7 +208,7 @@ class EllipticCurve:
 
         if point_p[0] != point_q[0]:
             a = point_q[1] - point_p[1]
-            b = MultiplicativeGroup(self.field).get_inverse_element(point_q[0] - point_p[0])
+            b = self._find_inverse(point_q[0] - point_p[0], self.field)
 
             lambdas = a * b % self.field
 
@@ -201,7 +217,7 @@ class EllipticCurve:
 
         elif point_p[0] == point_q[0] and point_p[1] == point_q[1] and point_p[1] != 0:
             a = (3 * point_p[0] ** 2 + self.attributes[5]) % self.field
-            b = MultiplicativeGroup(self.field).get_inverse_element(2 * point_p[1])
+            b = self._find_inverse(2 * point_p[1], self.field)
 
             lambdas = a * b % self.field
             x_r = (lambdas ** 2 - 2 * point_p[0]) % self.field
@@ -265,7 +281,7 @@ class EllipticCurve:
         for order in list_of_orders:
             list_of_point_orders.append([order])
 
-        for point in points[1]:
+        for point in points:
             if point == "[∞,∞]":
                 order = 1
             else:
@@ -277,7 +293,8 @@ class EllipticCurve:
 
         return list_of_point_orders
 
-    def get_possible_orders(self, order: int, new_order: int = None):
+    @classmethod
+    def get_possible_orders(cls, order: int, new_order: int = None):
         """Gets the possible orders of points on a curve of certain order or if a curves order was changed to a given value.
 
         Args:
@@ -292,11 +309,11 @@ class EllipticCurve:
             order_of_curve = order
             new_field = new_order
         else:
-            order_of_curve = new_order
-            new_field = new_order
+            order_of_curve = order
+            new_field = order
 
-        possible_orders_old = self.divisors(order_of_curve)
-        possible_orders_field = self.divisors(new_field)
+        possible_orders_old = cls._divisors(order_of_curve)
+        possible_orders_field = cls._divisors(new_field)
         possible_orders_new = []
 
         for order_old in possible_orders_old:

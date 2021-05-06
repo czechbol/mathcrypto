@@ -251,7 +251,7 @@ class DHCracker:
         return None
 
     @classmethod
-    def mov_attack(secret: int, g: int, order: int) -> int or None:
+    def mov_attack(cls, secret: int, g: int, order: int) -> int or None:
         """The MOV attack on Elliptic curve DH.
 
         Args:
