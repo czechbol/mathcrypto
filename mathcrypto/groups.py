@@ -81,6 +81,29 @@ class MultiplicativeGroup:
             s.add(int(gmpy2.powmod(element, exp, self.mod)))
         return len(s)
 
+    def get_element_subgroup(self, element) -> int:
+        """Gets the subgroup of any element in the group
+
+        Args:
+            element (int): Element of the group
+
+        Raises:
+            ValueError: When the ``element`` does not belong to the group
+
+        Returns:
+            list: Returns the order of ``element`` in the group
+        """
+
+        if element not in self.elements:
+            raise ValueError
+        if element in self.generators:
+            return self.order
+
+        s = set()
+        for exp in range(len(self.elements)):
+            s.add(int(gmpy2.powmod(element, exp, self.mod)))
+        return list(s)
+
     def get_inverse_element(self, element: int) -> int:
         """Gets the inverse to an element in the group
 
