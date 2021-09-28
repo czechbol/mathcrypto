@@ -75,7 +75,7 @@ Getting Started
        print(group.elements)
        print("Group generators:")  # If there are any
        print(group.generators)
-   
+
    main()
 
 This outputs:
@@ -83,7 +83,7 @@ This outputs:
 .. code-block:: text
 
    Playing with math functions
-   
+
    Is 137 prime?
    True
    What are the factors of 134?
@@ -120,6 +120,7 @@ MathCrypto is licensed under the `MIT License <https://github.com/Czechbol/mathc
    :name: mastertoc
    :maxdepth: 2
 
+   self
    mathcrypto
 
 

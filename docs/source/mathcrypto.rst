@@ -1,37 +1,46 @@
-mathcrypto package
-==================
+Cryptography module
+===================
 
-Submodules
-----------
+Primes
+------
 
-mathcrypto.crypto module
-------------------------
-
-.. automodule:: mathcrypto.crypto
+.. automodule:: mathcrypto.cryptography.primes
    :members:
    :undoc-members:
    :show-inheritance:
 
-mathcrypto.funcs module
------------------------
+Diffie Hellmann
+---------------
 
-.. automodule:: mathcrypto.funcs
+.. automodule:: mathcrypto.cryptography.diffie_hellman
    :members:
    :undoc-members:
    :show-inheritance:
 
-mathcrypto.groups module
-------------------------
+Elliptic Curves
+---------------
 
-.. automodule:: mathcrypto.groups
+.. automodule:: mathcrypto.cryptography.elliptic_curves
    :members:
    :undoc-members:
    :show-inheritance:
 
-mathcrypto.elliptic module
-------------------------
+Math module
+===========
 
-.. automodule:: mathcrypto.elliptic
+Functions
+---------
+
+.. automodule:: mathcrypto.math.funcs
    :members:
    :undoc-members:
    :show-inheritance:
+
+Groups
+------
+
+.. automodule:: mathcrypto.math.groups
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
