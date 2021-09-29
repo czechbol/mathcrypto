@@ -151,8 +151,6 @@ class Primes:
             list: List of factors including duplicates
         """
 
-        """Using gmpy2 library (written in C) for faster computation."""
-
         factors = []
         if cls.is_probable_prime_fermat(num):
             return [num]

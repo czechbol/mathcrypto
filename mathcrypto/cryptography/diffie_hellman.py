@@ -1,4 +1,4 @@
-import gmpy2
+import math
 import multiprocessing
 from random import randint
 from .primes import Primes
@@ -43,10 +43,10 @@ class DHCryptosystem:
         self.generator = randint(1, self.prime - 1)  # nosec
         self.alice_secret = randint(1, self.prime)  # nosec
         self.bob_secret = randint(1, self.prime)  # nosec
-        self.alice_sends = int(gmpy2.powmod(self.generator, self.alice_secret, self.prime))
-        self.bob_sends = int(gmpy2.powmod(self.generator, self.bob_secret, self.prime))
-        self.alice_key = int(gmpy2.powmod(self.bob_sends, self.alice_secret, self.prime))
-        self.bob_key = int(gmpy2.powmod(self.alice_sends, self.bob_secret, self.prime))
+        self.alice_sends = pow(self.generator, self.alice_secret, self.prime)
+        self.bob_sends = pow(self.generator, self.bob_secret, self.prime)
+        self.alice_key = pow(self.bob_sends, self.alice_secret, self.prime)
+        self.bob_key = pow(self.alice_sends, self.bob_secret, self.prime)
 
     def generate_rest(self):
         """Generates the missing attributes of the DHCryptosystem attributes if possible.
@@ -73,25 +73,25 @@ class DHCryptosystem:
             raise ValueError("You can't generate a valid DHCryptosystem like that.")
 
         if self.alice_sends is None:
-            self.alice_sends = int(gmpy2.powmod(self.generator, self.alice_secret, self.prime))
+            self.alice_sends = pow(self.generator, self.alice_secret, self.prime)
             was_generated.append(True)
         elif True in was_generated:
             raise ValueError("You can't generate a valid DHCryptosystem like that.")
 
         if self.bob_sends is None:
-            self.bob_sends = int(gmpy2.powmod(self.generator, self.bob_secret, self.prime))
+            self.bob_sends = pow(self.generator, self.bob_secret, self.prime)
             was_generated.append(True)
         elif True in was_generated:
             raise ValueError("You can't generate a valid DHCryptosystem like that.")
 
         if self.alice_key is None:
-            self.alice_key = int(gmpy2.powmod(self.bob_sends, self.alice_secret, self.prime))
+            self.alice_key = pow(self.bob_sends, self.alice_secret, self.prime)
             was_generated.append(True)
         elif True in was_generated:
             raise ValueError("You can't generate a valid DHCryptosystem like that.")
 
         if self.bob_key is None:
-            self.bob_key = int(gmpy2.powmod(self.alice_sends, self.bob_secret, self.prime))
+            self.bob_key = pow(self.alice_sends, self.bob_secret, self.prime)
             was_generated.append(True)
         elif True in was_generated:
             raise ValueError("You can't generate a valid DHCryptosystem like that.")
@@ -118,17 +118,17 @@ class DHCracker:
             list: List of ranges to iterate through
         """
 
-        chunk_size = gmpy2.t_div(prime, num_chunks)
+        chunk_size = int(prime / num_chunks)
         prev_chunk = 0
         chunks = []
         for i in range(num_chunks):
             this_chunk_start = prev_chunk
-            remaining = gmpy2.sub(prime, chunk_size)
+            remaining = prime - chunk_size
             if remaining < chunk_size:
-                chunks.append(range(this_chunk_start, gmpy2.add(this_chunk_start, remaining + 1)))
+                chunks.append(range(this_chunk_start, this_chunk_start + remaining + 1))
             else:
-                chunks.append(range(this_chunk_start, gmpy2.add(this_chunk_start, chunk_size + 1)))
-            prev_chunk = gmpy2.add(this_chunk_start, chunk_size + 1)
+                chunks.append(range(this_chunk_start, this_chunk_start + chunk_size + 1))
+            prev_chunk = this_chunk_start + chunk_size + 1
 
         return chunks
 
@@ -168,14 +168,14 @@ class DHCracker:
             if key.value != -1:
                 return
 
-            test = gmpy2.powmod(crack_me.generator, i, crack_me.prime)
+            test = pow(crack_me.generator, i, crack_me.prime)
             if test == crack_me.alice_sends:
                 with key.get_lock():
-                    key.value = int(gmpy2.powmod(crack_me.bob_sends, i, crack_me.prime))
+                    key.value = pow(crack_me.bob_sends, i, crack_me.prime)
                 break
             if test == crack_me.bob_sends:
                 with key.get_lock():
-                    key.value = int(gmpy2.powmod(crack_me.alice_sends, i, crack_me.prime))
+                    key.value = pow(crack_me.alice_sends, i, crack_me.prime)
                 break
 
     @classmethod
@@ -206,31 +206,29 @@ class DHCracker:
         Returns:
             int or None: int if a key was found, else None
         """
-        N = gmpy2.add(1, gmpy2.isqrt(crack_me.prime))
+        N = math.isqrt(crack_me.prime) + 1
 
         baby_steps_tabulka = {}
         baby_step = 1
         for i in range(N + 1):
             baby_steps_tabulka[baby_step] = i
-            baby_step = gmpy2.t_mod(gmpy2.mul(baby_step, crack_me.generator), crack_me.prime)
+            baby_step = (baby_step * crack_me.generator) % crack_me.prime
 
-        inverzni_k_N = gmpy2.powmod(
-            crack_me.generator, gmpy2.mul(gmpy2.sub(crack_me.prime, 2), N), crack_me.prime
-        )
+        inverzni_k_N = pow(crack_me.generator, (crack_me.prime - 2) * N, crack_me.prime)
         giant_step = crack_me.alice_sends
 
         for j in range(N + 1):
             if giant_step in baby_steps_tabulka:
-                temp = gmpy2.add(gmpy2.mul(j, N), baby_steps_tabulka[giant_step])
-                log = int(gmpy2.powmod(crack_me.generator, temp, crack_me.prime))
+                temp = (j * N) + baby_steps_tabulka[giant_step]
+                log = pow(crack_me.generator, temp, crack_me.prime)
                 if log == crack_me.alice_sends:
-                    cracked_key = gmpy2.powmod(crack_me.bob_sends, temp, crack_me.prime)
+                    cracked_key = pow(crack_me.bob_sends, temp, crack_me.prime)
                     return int(cracked_key)
                 if log == crack_me.bob_sends:
-                    cracked_key = gmpy2.powmod(crack_me.alice_sends, temp, crack_me.prime)
+                    cracked_key = pow(crack_me.alice_sends, temp, crack_me.prime)
                     return int(cracked_key)
             else:
-                giant_step = gmpy2.t_mod(gmpy2.mul(giant_step, inverzni_k_N), crack_me.prime)
+                giant_step = (giant_step * inverzni_k_N) % crack_me.prime
         return None
 
     @classmethod
