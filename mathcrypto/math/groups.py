@@ -1,4 +1,5 @@
 from .funcs import MathFunctions
+from ..cryptography.primes import Primes
 
 
 class MultiplicativeGroup:
@@ -42,7 +43,7 @@ class MultiplicativeGroup:
         """
 
         phi = MathFunctions.phi(self.mod)
-        phi_factors = MathFunctions.factorize(phi)
+        phi_factors = Primes.factorize(phi)
         cleaned_factors = []
         for i in phi_factors:
             if i not in cleaned_factors:
@@ -96,7 +97,7 @@ class MultiplicativeGroup:
         if element not in self.elements:
             raise ValueError
         if element in self.generators:
-            return self.order
+            return self.elements
 
         s = set()
         for exp in range(len(self.elements)):

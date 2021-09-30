@@ -20,7 +20,7 @@ class MathFunctions:
         if Primes.is_probable_prime_fermat(num):
             return num - 1
 
-        factors = cls.factorize(num)
+        factors = Primes.factorize(num)
         totient = 1
         used = []
         for factor in factors:
