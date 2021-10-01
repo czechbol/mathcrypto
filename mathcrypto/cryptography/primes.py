@@ -52,7 +52,7 @@ class Primes:
         return True
 
     @classmethod
-    def is_probable_prime_fermat(cls, num: int, rounds: int = 5, verbose: bool = False) -> bool:
+    def is_probable_prime_fermat(cls, num: int, rounds: int = 5) -> bool:
         """Automatic Fermat's primality test
 
         This test can not provide 100% certainty that the number is indeed prime, \
@@ -78,25 +78,22 @@ class Primes:
                 - list: List of [<number it was tested against>: `int`,<result>: `int`]
         """
 
-        if num - 1 < 5:
+        if num == 1 or num == 2:
+            return True
+
+        if num % 2 == 0:
+            return False
+
+        if num - 1 < rounds:
             rounds = num - 1
         else:
             rounds = rounds
 
-            result_list = []
-        is_prime = None
-        for x in range(rounds):
-            tester = random.randint(2, num - 2)
-            res = pow(tester, num - 1, num)
-            if res != 1:
-                is_prime = False
-            result_list.append([tester, res])
-        if is_prime is None:
-            is_prime = True
-
-        if verbose:
-            return is_prime, result_list
-        return is_prime
+        for i in range(rounds):
+            testnum = random.randint(2, num - 1)
+            if pow(testnum, num - 1, num) != 1:
+                return False
+        return True
 
     @classmethod
     def is_probable_prime_fermat_manual(cls, num: int, tester: int, verbose: bool = False) -> bool:
@@ -150,8 +147,6 @@ class Primes:
         Returns:
             list: List of factors including duplicates
         """
-
-        """Using gmpy2 library (written in C) for faster computation."""
 
         factors = []
         if cls.is_probable_prime_fermat(num):

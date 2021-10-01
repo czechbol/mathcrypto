@@ -1,5 +1,5 @@
-import gmpy2
 from .funcs import MathFunctions
+from ..cryptography.primes import Primes
 
 
 class MultiplicativeGroup:
@@ -31,7 +31,7 @@ class MultiplicativeGroup:
 
         elements = []
         for i in range(1, self.mod):
-            if gmpy2.gcd(i, self.mod) == 1:
+            if MathFunctions.euclid_gcd(i, self.mod) == 1:
                 elements.append(i)
         return elements
 
@@ -43,7 +43,7 @@ class MultiplicativeGroup:
         """
 
         phi = MathFunctions.phi(self.mod)
-        phi_factors = MathFunctions.factorize(phi)
+        phi_factors = Primes.factorize(phi)
         cleaned_factors = []
         for i in phi_factors:
             if i not in cleaned_factors:
@@ -52,7 +52,7 @@ class MultiplicativeGroup:
         generators = []
         for element in self.elements:
             for factor in cleaned_factors:
-                if gmpy2.powmod(element, int(phi / factor), self.mod) == 1:
+                if pow(element, int(phi / factor), self.mod) == 1:
                     break
             else:
                 generators.append(element)
@@ -78,7 +78,7 @@ class MultiplicativeGroup:
 
         s = set()
         for exp in range(len(self.elements)):
-            s.add(int(gmpy2.powmod(element, exp, self.mod)))
+            s.add(pow(element, exp, self.mod))
         return len(s)
 
     def get_element_subgroup(self, element) -> int:
@@ -97,11 +97,11 @@ class MultiplicativeGroup:
         if element not in self.elements:
             raise ValueError
         if element in self.generators:
-            return self.order
+            return self.elements
 
         s = set()
         for exp in range(len(self.elements)):
-            s.add(int(gmpy2.powmod(element, exp, self.mod)))
+            s.add(pow(element, exp, self.mod))
         return list(s)
 
     def get_inverse_element(self, element: int) -> int:
@@ -120,5 +120,5 @@ class MultiplicativeGroup:
         """Returns the inverse to an element in the group"""
         if element not in self.elements:
             raise ValueError
-        inverse = int(gmpy2.powmod(element, MathFunctions.phi(self.mod) - 1, self.mod))
+        inverse = pow(element, MathFunctions.phi(self.mod) - 1, self.mod)
         return inverse

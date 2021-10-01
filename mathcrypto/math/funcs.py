@@ -1,4 +1,4 @@
-import gmpy2
+from ..cryptography.primes import Primes
 
 
 class MathFunctions:
@@ -17,19 +17,17 @@ class MathFunctions:
             int: How many elements belong to a multiplicative group set by this number.
         """
 
-        """Using gmpy2 library (written in C) for faster computation."""
-
-        if gmpy2.is_prime(num):
+        if Primes.is_probable_prime_fermat(num):
             return num - 1
 
-        factors = cls.factorize(num)
+        factors = Primes.factorize(num)
         totient = 1
         used = []
         for factor in factors:
             if factor in used:
-                totient = gmpy2.mul(totient, factor)  # same as (totient * factor) but faster
+                totient = totient * factor  # same as (totient * factor) but faster
             else:
-                totient = gmpy2.mul(totient, factor - 1)  # same as (totient * (factor - 1)) but faster
+                totient = totient * (factor - 1)  # same as (totient * (factor - 1)) but faster
                 used.append(factor)
         return int(totient)
 
@@ -70,8 +68,6 @@ class MathFunctions:
             int: Solution for x
         """
 
-        """Using gmpy2 library (written in C) for faster computation."""
-
         M = 1
         temp = 0
 
@@ -83,21 +79,21 @@ class MathFunctions:
                 continue
 
             for num in moduli:
-                if gmpy2.gcd(num, item[1]) != 1:
+                if cls.euclid_gcd(num, item[1]) != 1:
                     break
             else:
                 moduli.append(item[1])
                 M *= item[1]
 
         for item in lis:
-            N = gmpy2.t_div(M, item[1])  # same as int(M / item[1]) but faster
-            L = gmpy2.powmod(N, -1, item[1])  # = n^(-1) mod item[1], the inverse element of n mod item[1]
-            W = gmpy2.t_mod(gmpy2.mul(L, N), M)  # same as ((L*N) % M) but faster
-            temp += gmpy2.mul(item[0], W)  # same as (item[1] * W) but faster
-        return int(gmpy2.t_mod(temp, M))  # same as (temp % M) but faster
+            N = int(M / item[1])  # same as int(M / item[1]) but faster
+            L = pow(N, -1, item[1])  # = n^(-1) mod item[1], the inverse element of n mod item[1]
+            W = (L * N) % M  # same as ((L*N) % M) but faster
+            temp += item[1] * W  # same as (item[1] * W) but faster
+        return int((temp % M))  # same as (temp % M) but faster
 
     @classmethod
-    def eea(cls, modulus: int, number: int, verbose: bool = False) -> int:
+    def eea(cls, modulus: int, number: int, verbose: bool = False) -> int:  # noqa: C901
         """Extended Euclidean Algorithm
 
         Get multiplicative inverse of a number in modulus
@@ -117,14 +113,12 @@ class MathFunctions:
             str: Graphical solution of the problem.
         """
 
-        """Using gmpy2 library (written in C) for faster computation."""
-
         class EEA:
             def __init__(self, n: int, x: int):
                 self.n = n
                 self.x = x
 
-                if gmpy2.gcd(n, x) != 1:
+                if cls.euclid_gcd(n, x) != 1:
                     raise ValueError(f"{x} is not element of group Z_{n}^*.")
 
                 self.table = self._compute_table()
