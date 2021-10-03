@@ -86,11 +86,11 @@ class MathFunctions:
                 M *= item[1]
 
         for item in lis:
-            N = int(M / item[1])  # same as int(M / item[1]) but faster
-            L = pow(N, -1, item[1])  # = n^(-1) mod item[1], the inverse element of n mod item[1]
-            W = (L * N) % M  # same as ((L*N) % M) but faster
-            temp += item[1] * W  # same as (item[1] * W) but faster
-        return int((temp % M))  # same as (temp % M) but faster
+            N = int(M / item[1])
+            L = pow(N, MathFunctions.phi(item[1]) - 1, item[1])
+            W = (L * N) % M
+            temp += item[0] * W
+        return temp % M
 
     @classmethod
     def eea(cls, modulus: int, number: int, verbose: bool = False) -> int:  # noqa: C901
