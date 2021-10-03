@@ -96,43 +96,6 @@ class Primes:
         return True
 
     @classmethod
-    def is_probable_prime_fermat_manual(cls, num: int, tester: int, verbose: bool = False) -> bool:
-        """Manual Fermat's primality test
-
-        This test can not provide 100% certainty that the number is indeed prime,\
-        so more than 1 round should be required.
-        If determined that the number is not prime, that is on the other hand 100% certain.
-        You should test for at least 2-3 rounds.
-        If any round returns a result that is not 1, the number is not prime.
-
-        Args:
-            num (int): Number to be tested
-            tester (int): Number to test the primality of ``num`` with
-            verbose (bool, optional): Whether to return optional \
-                list of [<number it was tested against>: `int`,<result>: `int`]. \
-                Defaults to False.
-
-        Returns:
-            bool: True if probably prime
-
-        If verbose, returns:
-            (tuple): tuple containing:
-
-                - bool: True if probably prime
-                - list: List of [<number it was tested against>: `int`,<result>: `int`]
-        """
-
-        res = pow(tester, num - 1, num)
-        result = [tester, res]
-        if res != 1:
-            is_prime = False
-        else:
-            is_prime = True
-        if verbose:
-            return is_prime, result
-        return is_prime
-
-    @classmethod
     def factorize(cls, num: int) -> list:
         """Classic number factorization
 
